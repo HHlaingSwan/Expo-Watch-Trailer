@@ -15,7 +15,7 @@ const TabIcon = ({
   if (focused) {
     return (
       <>
-        <View className="flex-1 flex-row w-full min-w-[110px] gap-1 min-h-16 mt-4 rounded-full overflow-hidden items-center justify-center bg-indigo-500">
+        <View className="flex-1 flex-row w-full min-w-[112px] gap-1  min-h-16 mt-6 rounded-full overflow-hidden items-center justify-center bg-indigo-400">
           <Icon
             strokeWidth={1.5}
             color="#151312"
@@ -28,7 +28,7 @@ const TabIcon = ({
   }
   return (
     <>
-      <View className="flex-1 mt-4   rounded-full size-full items-center justify-center ">
+      <View className="flex-1 mt-6  rounded-full size-full items-center justify-center ">
         <Icon strokeWidth={1.5} color="#A1A1AA" className="size-5 font-thin" />
       </View>
     </>
@@ -44,9 +44,9 @@ const _layout = () => {
         tabBarStyle: {
           backgroundColor: "#0f0D23",
           borderRadius: 50,
-          marginBottom: 36,
-          marginHorizontal: 24,
-          height: 52,
+          marginBottom: 34,
+          marginHorizontal: 18,
+          height: 60,
           position: "absolute",
           overflow: "hidden",
           borderWidth: 1,

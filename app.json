@@ -44,6 +44,10 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "TMDB_API_KEY": "2fb6ed0340be6b4ad1c241c6589d80bd",
+      "TMDB_READ_ACCESS_KEY": "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmI2ZWQwMzQwYmU2YjRhZDFjMjQxYzY1ODlkODBiZCIsIm5iZiI6MTczMDcxMjAwMy43NTUyNTkzLCJzdWIiOiI2NzE0YjRiOTBjYjYyNTJmOTkwOGE0MjAiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.BLdeQqrNZzCDVrUHWjvslwSh2QDAbGZZgv14jiTlyMM"
     }
   }
 }
