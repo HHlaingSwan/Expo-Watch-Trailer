@@ -4,20 +4,18 @@ import SearchingBar from "@/components/SearchingBar";
 import { fetchMovies } from "@/services/api";
 import useFetch from "@/services/useFetch";
 import { useRouter } from "expo-router";
-import { CrossIcon } from "lucide-react-native";
+import { X } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const search = () => {
+const Search = () => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const {
     data: movies,
     loading: moviesLoading,
-    error: moviesError,
     refetch,
-    reset,
   } = useFetch(() => fetchMovies({ query: searchQuery }), false);
 
   useEffect(() => {
@@ -30,25 +28,27 @@ const search = () => {
     }, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
+  }, [searchQuery, refetch]);
 
   return (
     <SafeAreaView className="flex-1 bg-slate-950" edges={["top"]}>
-      <View className="mb-4 px-5 bg-orange-600 ">
-        <View className="relative ">
-          <SearchingBar
-            onPress={() => router.push("/search")}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          <CrossIcon
-            className="absolute top-1/2 right-2 transform -translate-y-1/2 text-white"
-            onPress={() => setSearchQuery("")}
-          />
+      <View className="mb-4 bg-slate-950 px-5 pt-4">
+        <View className="relative rounded-lg">
+          <SearchingBar value={searchQuery} onChangeText={setSearchQuery} />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity className="absolute top-4  right-2">
+              <X
+                onPress={() => setSearchQuery("")}
+                color="#fff"
+                className="size-5 font-thin"
+                strokeWidth={1}
+              />
+            </TouchableOpacity>
+          )}
         </View>
         {searchQuery.length > 0 && (
           <Text className="text-slate-300 text-lg mt-4 font-semibold">
-            You're searching is "{searchQuery}"
+            You&apos;re searching for &quot;{searchQuery}&quot;
           </Text>
         )}
       </View>
@@ -84,6 +84,4 @@ const search = () => {
   );
 };
 
-export default search;
-
-const styles = StyleSheet.create({});
+export default Search;

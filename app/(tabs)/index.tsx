@@ -1,11 +1,7 @@
 import Loader from "@/components/LoadingStates";
 import MovieCard from "@/components/MovieCard";
 import SearchingBar from "@/components/SearchingBar";
-import {
-  fetchMovies,
-  fetchTrendingMoviesAndTvShows,
-  getImagePath,
-} from "@/services/api";
+import { fetchMovies, getImagePath } from "@/services/api";
 import useFetch from "@/services/useFetch";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -17,58 +13,38 @@ export default function Index() {
   const [featuredIndex, setFeaturedIndex] = useState(0);
 
   // Fetch popular movies on load
-  const {
-    data: movies,
-    loading: moviesLoading,
-    error: moviesError,
-    refetch,
-  } = useFetch(() => fetchMovies({ query: "" }));
-
-  const {
-    data: trendingTvShows,
-    loading: trendingTvShowsLoading,
-    error: trendingTvShowsError,
-    refetch: refetchTrendingTvShows,
-  } = useFetch(() => fetchTrendingMoviesAndTvShows("tv"));
-
-  const allContent = [...(trendingTvShows || []), ...(movies || [])];
-
-  const sortedContent = [...(allContent || [])].sort(
-    (a, b) =>
-      new Date(b.release_date || b.first_air_date).getTime() -
-      new Date(a.release_date || a.first_air_date).getTime(),
+  const { data: movies, loading: moviesLoading } = useFetch(() =>
+    fetchMovies({ query: "" }),
   );
 
   useEffect(() => {
-    if (!sortedContent || sortedContent.length === 0) return;
+    if (!movies || movies.length === 0) return;
 
     const interval = setInterval(() => {
-      setFeaturedIndex((prev) => (prev + 1) % sortedContent.length);
+      setFeaturedIndex((prev) => (prev + 1) % movies.length);
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [sortedContent]);
+  }, [movies]);
 
   const handleMoviePress = (id: number, movieType: string) => {
-    console.log("type click", movieType);
-
     router.push({
       pathname: "/movie/[id]",
       params: { id, movieType: movieType },
     });
   };
 
-  const featuredMovie = sortedContent?.[featuredIndex];
+  const featuredMovie = movies?.[featuredIndex];
 
   return (
     <SafeAreaView className="flex-1 bg-slate-950" edges={["top"]}>
-      {moviesLoading || trendingTvShowsLoading ? (
+      {moviesLoading ? (
         <Loader />
       ) : (
         <FlatList
           className="flex-1  w-full "
           numColumns={3}
-          data={sortedContent || []}
+          data={movies || []}
           keyExtractor={(item) =>
             item.id?.toString() || Math.random().toString()
           }

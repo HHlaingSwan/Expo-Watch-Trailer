@@ -1,14 +1,14 @@
 import { Search } from "lucide-react-native";
 import React from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import { TextInput, View } from "react-native";
 
 interface Props {
-  onPress: () => void;
+  onPress?: () => void;
   value?: string;
   onChangeText?: (text: string) => void;
 }
 
-const SearchingBar = ({ onPress, value, onChangeText }: Props) => {
+const SearchingBar = ({ value, onChangeText, onPress }: Props) => {
   return (
     <View className="flex-row items-center rounded-lg w-full p-2 border-b border-zinc-50">
       <Search color="#A1A1AA" className="size-5 font-thin" strokeWidth={1} />
@@ -25,5 +25,3 @@ const SearchingBar = ({ onPress, value, onChangeText }: Props) => {
 };
 
 export default SearchingBar;
-
-const styles = StyleSheet.create({});

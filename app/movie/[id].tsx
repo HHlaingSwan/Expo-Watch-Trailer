@@ -1,24 +1,42 @@
-import { fetchMovieDetails, getImagePath } from "@/services/api";
+import MovieCard from "@/components/MovieCard";
+import {
+  fetchMovieDetails,
+  fetchSimilar,
+  getImagePath,
+} from "@/services/api";
 import useFetch from "@/services/useFetch";
-import { useLocalSearchParams } from "expo-router";
-import React from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
+  FlatList,
   Image,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
+import YoutubeIframe from "react-native-youtube-iframe";
 
 const Details = () => {
   const { id, movieType } = useLocalSearchParams();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const router = useRouter();
 
   const {
     data: movie,
     loading,
     error,
   } = useFetch(() => fetchMovieDetails(Number(id), movieType as string));
+
+  const { data: similarMovies } = useFetch(() =>
+    fetchSimilar(Number(id), movieType as string)
+  );
+
+  const onStateChange = useCallback((state: string) => {
+    if (state === "ended") {
+      setIsPlaying(false);
+    }
+  }, []);
 
   if (loading) {
     return (
@@ -37,6 +55,9 @@ const Details = () => {
       </View>
     );
   }
+  const trailer = movie?.videos?.results.find(
+    (video: any) => video.type === "Trailer"
+  );
 
   return (
     <View className="flex-1 bg-slate-900">
@@ -91,6 +112,19 @@ const Details = () => {
               {movie?.overview || "No overview available."}
             </Text>
           </View>
+          {trailer && (
+            <View className="mt-6">
+              <Text className="text-xl text-white font-semibold mb-3">
+                Trailer
+              </Text>
+              <YoutubeIframe
+                height={215}
+                play={isPlaying}
+                videoId={trailer.key}
+                onChangeState={onStateChange}
+              />
+            </View>
+          )}
 
           {movie?.genres && movie.genres.length > 0 && (
             <View className="mt-6">
@@ -107,6 +141,37 @@ const Details = () => {
                   </View>
                 ))}
               </View>
+            </View>
+          )}
+
+          {movie?.credits?.cast && movie.credits.cast.length > 0 && (
+            <View className="mt-6">
+              <Text className="text-xl text-white font-semibold mb-3">
+                Cast
+              </Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: 16, paddingHorizontal: 5 }}
+              >
+                {movie.credits.cast.slice(0, 10).map((actor: any) => (
+                  <View key={actor.id} className="items-center w-24">
+                    <Image
+                      source={{
+                        uri: getImagePath(actor.profile_path),
+                      }}
+                      resizeMode="cover"
+                      className="w-20 h-20 rounded-full"
+                    />
+                    <Text
+                      className="text-white text-xs mt-2 text-center"
+                      numberOfLines={2}
+                    >
+                      {actor.name}
+                    </Text>
+                  </View>
+                ))}
+              </ScrollView>
             </View>
           )}
 
@@ -148,6 +213,31 @@ const Details = () => {
                 </View>
               </View>
             )}
+
+          {similarMovies && similarMovies.length > 0 && (
+            <View className="mt-6">
+              <Text className="text-xl text-white font-semibold mb-4">
+                Similar Movies
+              </Text>
+              <FlatList
+                data={similarMovies}
+                renderItem={({ item }) => (
+                  <View className="w-40">
+                    <MovieCard
+                      item={item}
+                      onPress={() => {
+                        router.push(`/movie/${item.id}?movieType=movie`);
+                      }}
+                    />
+                  </View>
+                )}
+                keyExtractor={(item) => item.id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: 16, paddingHorizontal: 5 }}
+              />
+            </View>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -155,5 +245,3 @@ const Details = () => {
 };
 
 export default Details;
-
-const styles = StyleSheet.create({});

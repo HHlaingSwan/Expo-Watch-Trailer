@@ -24,7 +24,7 @@ export const getImagePath = (path: string) => {
 export const fetchMovies = async ({ query }: { query: string }) => {
   const endpoint = query
     ? `${TMDB_CONFIG.BASE_URL}/search/movie?query=${encodeURIComponent(query)}&include_adult=false`
-    : `${TMDB_CONFIG.BASE_URL}/discover/movie?sort_by=popularity.desc`;
+    : `${TMDB_CONFIG.BASE_URL}/trending/all/day?language=en-US`;
 
   console.log("Endpoint:", endpoint);
 
@@ -42,7 +42,7 @@ export const fetchMovies = async ({ query }: { query: string }) => {
 };
 
 export const fetchMovieDetails = async (movieId: number, movieType: string) => {
-  const endpoint = `${TMDB_CONFIG.BASE_URL}/${movieType}/${movieId}`;
+  const endpoint = `${TMDB_CONFIG.BASE_URL}/${movieType}/${movieId}?append_to_response=videos,credits`;
   console.log("endpoint", endpoint);
 
   const response = await fetch(endpoint, {
@@ -84,6 +84,21 @@ export const fetchNowPlayingMovies = async (url: string) => {
 
   if (!response.ok) {
     throw new Error(`Failed to fetch now playing movies: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.results;
+};
+export const fetchSimilar = async (movieId: number, movieType: string) => {
+  const endpoint = `${TMDB_CONFIG.BASE_URL}/${movieType}/${movieId}/similar`;
+
+  const response = await fetch(endpoint, {
+    method: "GET",
+    headers: TMDB_CONFIG.headers,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch similar movies: ${response.status}`);
   }
 
   const data = await response.json();
