@@ -4,13 +4,19 @@ import {
   fetchSimilar,
   getImagePath,
 } from "@/services/api";
+import {
+  isMovieSaved,
+  removeMovie,
+  saveMovie,
+} from "@/services/storage";
 import useFetch from "@/services/useFetch";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Image,
+  Pressable,
   ScrollView,
   Text,
   View,
@@ -21,12 +27,30 @@ const Details = () => {
   const { id, movieType } = useLocalSearchParams();
   const [isPlaying, setIsPlaying] = useState(false);
   const router = useRouter();
+  const [isSaved, setIsSaved] = useState(false);
 
   const {
     data: movie,
     loading,
     error,
   } = useFetch(() => fetchMovieDetails(Number(id), movieType as string));
+
+  useEffect(() => {
+    if (movie) {
+      isMovieSaved(movie.id).then(setIsSaved);
+    }
+  }, [movie]);
+
+  const toggleSave = async () => {
+    if (!movie) return;
+    if (isSaved) {
+      await removeMovie(movie.id);
+      setIsSaved(false);
+    } else {
+      await saveMovie(movie);
+      setIsSaved(true);
+    }
+  };
 
   const { data: similarMovies } = useFetch(() =>
     fetchSimilar(Number(id), movieType as string)
@@ -101,6 +125,20 @@ const Details = () => {
                     "N/A"}
                 </Text>
               </View>
+              <Pressable
+                onPress={toggleSave}
+                className={`mt-4 px-4 py-2 rounded-full ${
+                  isSaved ? "bg-red-500/20" : "bg-blue-500/20"
+                }`}
+              >
+                <Text
+                  className={`text-center font-semibold ${
+                    isSaved ? "text-red-300" : "text-blue-300"
+                  }`}
+                >
+                  {isSaved ? "Unsave" : "Save"}
+                </Text>
+              </Pressable>
             </View>
           </View>
 

@@ -19,7 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.psychoo.MovieAppRN"
     },
     "web": {
       "output": "static",
@@ -47,7 +48,11 @@
     },
     "extra": {
       "TMDB_API_KEY": "2fb6ed0340be6b4ad1c241c6589d80bd",
-      "TMDB_READ_ACCESS_KEY": "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmI2ZWQwMzQwYmU2YjRhZDFjMjQxYzY1ODlkODBiZCIsIm5iZiI6MTczMDcxMjAwMy43NTUyNTkzLCJzdWIiOiI2NzE0YjRiOTBjYjYyNTJmOTkwOGE0MjAiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.BLdeQqrNZzCDVrUHWjvslwSh2QDAbGZZgv14jiTlyMM"
+      "TMDB_READ_ACCESS_KEY": "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmI2ZWQwMzQwYmU2YjRhZDFjMjQxYzY1ODlkODBiZCIsIm5iZiI6MTczMDcxMjAwMy43NTUyNTkzLCJzdWIiOiI2NzE0YjRiOTBjYjYyNTJmOTkwOGE0MjAiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.BLdeQqrNZzCDVrUHWjvslwSh2QDAbGZZgv14jiTlyMM",
+      "router": {},
+      "eas": {
+        "projectId": "4f00c1db-b6e1-4a54-bf4e-57f7a3696490"
+      }
     }
   }
 }
