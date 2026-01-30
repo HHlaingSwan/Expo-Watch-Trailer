@@ -1,4 +1,6 @@
 import { getImagePath } from "@/services/api";
+import { Bookmark } from "lucide-react-native";
+import React, { memo } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
 interface MovieCardProps {
@@ -12,9 +14,18 @@ interface MovieCardProps {
     vote_average?: number;
   };
   onPress?: () => void;
+  style?: any;
+  showTitle?: boolean;
+  isSaved?: boolean;
 }
 
-export default function MovieCard({ item, onPress }: MovieCardProps) {
+function MovieCard({
+  item,
+  onPress,
+  style,
+  showTitle,
+  isSaved,
+}: MovieCardProps) {
   const title = item.title || item.name || "Unknown";
   const date = item.release_date || item.first_air_date || "";
   const voteColor = item.vote_average
@@ -25,7 +36,7 @@ export default function MovieCard({ item, onPress }: MovieCardProps) {
         : "#ef4444"
     : "#6b7280";
 
-  return (
+  const card = (
     <TouchableOpacity
       className="flex-1 m-1 bg-slate-900 rounded-xl overflow-hidden"
       onPress={onPress}
@@ -36,6 +47,7 @@ export default function MovieCard({ item, onPress }: MovieCardProps) {
         shadowOpacity: 0.3,
         shadowRadius: 4,
         elevation: 5,
+        ...style,
       }}
     >
       <View className="relative">
@@ -48,8 +60,13 @@ export default function MovieCard({ item, onPress }: MovieCardProps) {
           className="w-full h-[180px]"
           resizeMode="cover"
         />
+        {isSaved && (
+          <View className="absolute top-2 right-2 bg-blue-500/80 p-1.5 rounded-full">
+            <Bookmark size={12} color="#fff" fill="#fff" />
+          </View>
+        )}
         <View
-          className="absolute top-2 right-2 px-2 py-1 rounded-full items-center justify-center"
+          className="absolute top-2 left-2 px-2 py-1 rounded-full items-center justify-center"
           style={{ backgroundColor: voteColor }}
         >
           <Text className="text-white text-[10px] font-bold">
@@ -57,17 +74,42 @@ export default function MovieCard({ item, onPress }: MovieCardProps) {
           </Text>
         </View>
       </View>
-      <View className="p-2 bg-slate-900">
+      {!showTitle && (
+        <View className="p-2 bg-slate-900">
+          <Text
+            className="text-white text-[12px] font-semibold"
+            numberOfLines={2}
+          >
+            {title}
+          </Text>
+          <Text className="text-gray-500 text-[10px] mt-1">
+            {date.split("-")[0] || "N/A"}
+          </Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+
+  if (showTitle) {
+    return (
+      <View style={{ alignItems: "center", width: 140 }}>
+        {card}
         <Text
-          className="text-white text-[12px] font-semibold"
-          numberOfLines={2}
+          style={{
+            color: "white",
+            fontSize: 14,
+            marginTop: 8,
+            textAlign: "center",
+          }}
+          numberOfLines={1}
         >
           {title}
         </Text>
-        <Text className="text-gray-500 text-[10px] mt-1">
-          {date.split("-")[0] || "N/A"}
-        </Text>
       </View>
-    </TouchableOpacity>
-  );
+    );
+  }
+
+  return card;
 }
+
+export default memo(MovieCard);

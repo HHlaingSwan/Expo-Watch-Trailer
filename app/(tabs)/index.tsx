@@ -1,132 +1,179 @@
 import Loader from "@/components/LoadingStates";
 import MovieCard from "@/components/MovieCard";
 import SearchingBar from "@/components/SearchingBar";
-import { fetchMovies, getImagePath } from "@/services/api";
-import useFetch from "@/services/useFetch";
-import { useRouter } from "expo-router";
+import { fetchMovies, fetchPopularMovies, getImagePath } from "@/services/api";
+import { getSavedMovies } from "@/services/storage";
+import { useFocusEffect, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import { Bookmark } from "lucide-react-native";
+import { useCallback, useEffect, useState } from "react";
+import { FlatList, Text, View, Image, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const router = useRouter();
-  const [featuredIndex, setFeaturedIndex] = useState(0);
 
-  // Fetch popular movies on load
-  const { data: movies, loading: moviesLoading } = useFetch(() =>
-    fetchMovies({ query: "" }),
+  // Trending movies
+  const [trendingMovies, setTrendingMovies] = useState<any[]>([]);
+  const [trendingLoading, setTrendingLoading] = useState(true);
+
+  // Popular movies
+  const [popularMovies, setPopularMovies] = useState<any[]>([]);
+  const [popularLoading, setPopularLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  // Saved movies
+  const [savedMovieIds, setSavedMovieIds] = useState<Set<number>>(new Set());
+
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadSavedMovies = async () => {
+        const saved = await getSavedMovies();
+        setSavedMovieIds(new Set(saved.map((m) => m.id)));
+      };
+      loadSavedMovies();
+    }, [])
   );
 
   useEffect(() => {
-    if (!movies || movies.length === 0) return;
+    // Fetch trending
+    fetchMovies({ query: "" }).then((results) => {
+      setTrendingMovies(results);
+      setTrendingLoading(false);
+    });
+    // Fetch first page of popular
+    fetchPopularMovies(1).then((data) => {
+      setPopularMovies(data.results);
+      setTotalPages(data.totalPages);
+      setPopularLoading(false);
+    });
+  }, []);
 
-    const interval = setInterval(() => {
-      setFeaturedIndex((prev) => (prev + 1) % movies.length);
-    }, 4000);
+  // Fetch more popular movies
+  const loadMorePopular = () => {
+    if (loadingMore || page >= totalPages) return;
+    setLoadingMore(true);
+    fetchPopularMovies(page + 1).then((data) => {
+      setPopularMovies((prev) => [...prev, ...data.results]);
+      setPage((prev) => prev + 1);
+      setLoadingMore(false);
+    });
+  };
 
-    return () => clearInterval(interval);
-  }, [movies]);
-
-  const handleMoviePress = (id: number, movieType: string) => {
+  const handleMoviePress = useCallback((id: number, movieType: string) => {
     router.push({
       pathname: "/movie/[id]",
       params: { id, movieType: movieType },
     });
-  };
-
-  const featuredMovie = movies?.[featuredIndex];
+  }, [router]);
 
   return (
     <>
       <StatusBar style="light" />
       <SafeAreaView className="flex-1 bg-slate-950">
-        {moviesLoading ? (
-          <Loader />
-        ) : (
-          <FlatList
-            className="flex-1  w-full "
-            numColumns={3}
-            data={movies || []}
-            keyExtractor={(item) =>
-              item.id?.toString() || Math.random().toString()
-            }
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingBottom: 100,
-              paddingHorizontal: 4,
-            }}
-            renderItem={({ item }) => (
-              <MovieCard
-                item={item}
-                onPress={() =>
-                  handleMoviePress(
-                    item.id,
-                    item.first_air_date !== undefined ? "tv" : "movie",
-                  )
-                }
-              />
-            )}
-            ListHeaderComponent={
-              <View className="w-full px-4 mb-4">
-                <View className="mb-6">
-                  <SearchingBar onPress={() => router.push("/search")} />
-                </View>
-
-                {featuredMovie && (
-                  <View className="mb-6">
-                    <TouchableOpacity
-                      className="relative w-full h-80 rounded-2xl overflow-hidden"
-                      onPress={() =>
-                        handleMoviePress(
-                          featuredMovie.id,
-                          featuredMovie.first_air_date !== undefined
-                            ? "tv"
-                            : "movie",
-                        )
-                      }
-                      activeOpacity={0.9}
-                    >
-                      <Image
-                        source={{
-                          uri: featuredMovie.poster_path
-                            ? getImagePath(featuredMovie.poster_path)
-                            : "https://via.placeholder.com/400x300/1e293b/fff?text=Featured",
-                        }}
-                        className="w-full h-full "
-                        resizeMode="cover"
-                      />
-                      <View className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
-                      <View className="absolute bottom-4 left-4 right-4">
-                        <Text className="text-emerald-400 text-xs font-semibold mb-1 uppercase tracking-wide">
-                          Featured
-                        </Text>
-                        <Text
-                          className="text-white text-xl font-bold"
-                          numberOfLines={2}
-                        >
-                          {featuredMovie.title || featuredMovie.name}
-                        </Text>
-                        <Text className="text-gray-300 text-sm mt-1">
-                          {featuredMovie.release_date?.split("-")[0] ||
-                            featuredMovie.first_air_date?.split("-")[0]}{" "}
-                          •{" "}
-                          <Text className="text-yellow-400">
-                            ★ {featuredMovie.vote_average?.toFixed(1)}
-                          </Text>
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
+          {popularLoading && page === 1 ? (
+            <Loader />
+          ) : (
+            <FlatList
+              data={popularMovies}
+              numColumns={3}
+              keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+              showsVerticalScrollIndicator={false}
+              onEndReached={loadMorePopular}
+              onEndReachedThreshold={0.5}
+              contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 80 }} // Adjusted paddingBottom
+              columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 12 }}
+              renderItem={({ item }) => (
+                <MovieCard
+                  item={item}
+                  isSaved={savedMovieIds.has(item.id)}
+                  style={{ width: '30%' }} // Adjust width to account for spacing
+                  onPress={() =>
+                    handleMoviePress(
+                      item.id,
+                      item.first_air_date !== undefined ? "tv" : "movie",
+                    )
+                  }
+                />
+              )}
+              ListHeaderComponent={
+                <>
+                  <View className="w-full px-4 mt-4 mb-2">
+                    <SearchingBar onPress={() => router.push("/search")} />
+                    <Text className="text-white text-xl font-bold mt-6 mb-3">
+                      Trending Movies
+                    </Text>
                   </View>
-                )}
+                  
+                  <View style={{ marginBottom: 20 }}>
+                    {trendingLoading ? (
+                      <Loader />
+                    ) : (
+                      <FlatList
+                        data={trendingMovies}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        keyExtractor={(item) =>
+                          item.id?.toString() || Math.random().toString()
+                        }
+                        contentContainerStyle={{ gap: 16, paddingHorizontal: 16 }}
+                        renderItem={({ item }) => (
+                          <TouchableOpacity
+                            style={{ alignItems: 'center', width: 140 }}
+                            onPress={() =>
+                              handleMoviePress(
+                                item.id,
+                                item.first_air_date !== undefined ? "tv" : "movie",
+                              )
+                            }
+                            activeOpacity={0.8}
+                          >
+                            <Image
+                              source={{
+                                uri: item.poster_path
+                                  ? getImagePath(item.poster_path)
+                                  : "https://via.placeholder.com/150x225/1e293b/fff?text=No+Image",
+                              }}
+                              style={{ width: 140, height: 210, borderRadius: 12 }}
+                              resizeMode="cover"
+                            />
+                            {savedMovieIds.has(item.id) && (
+                              <View className="absolute top-2 right-2 bg-blue-500/80 p-1.5 rounded-full">
+                                <Bookmark size={16} color="#fff" fill="#fff" />
+                              </View>
+                            )}
+                            <Text
+                              style={{ 
+                                color: 'white', 
+                                fontSize: 14, 
+                                marginTop: 8, 
+                                textAlign: 'center',
+                                fontWeight: '600'
+                              }}
+                              numberOfLines={1}
+                            >
+                              {item.title || item.name || "Untitled"}
+                            </Text>
+                          </TouchableOpacity>
+                        )}
+                      />
+                    )}
+                  </View>
 
-                <Text className="text-white text-xl font-bold mb-1">
-                  Explore Movies
-                </Text>
-              </View>
-            }
-          />
-        )}
+                  <View className="w-full px-4 mb-2">
+                    <Text className="text-white text-xl font-bold mb-3">
+                      Popular Movies
+                    </Text>
+                  </View>
+                </>
+              }
+              ListFooterComponent={loadingMore ? <Loader /> : null}
+            />
+          )}
+
       </SafeAreaView>
     </>
   );

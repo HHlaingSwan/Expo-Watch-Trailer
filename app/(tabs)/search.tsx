@@ -2,21 +2,34 @@ import Loader from "@/components/LoadingStates";
 import MovieCard from "@/components/MovieCard";
 import SearchingBar from "@/components/SearchingBar";
 import { fetchMovies } from "@/services/api";
+import { getSavedMovies } from "@/services/storage";
 import useFetch from "@/services/useFetch";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { X } from "lucide-react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Search = () => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [savedMovieIds, setSavedMovieIds] = useState<Set<number>>(new Set());
+
   const {
     data: movies,
     loading: moviesLoading,
     refetch,
   } = useFetch(() => fetchMovies({ query: searchQuery }), false);
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadSavedMovies = async () => {
+        const saved = await getSavedMovies();
+        setSavedMovieIds(new Set(saved.map((m) => m.id)));
+      };
+      loadSavedMovies();
+    }, [])
+  );
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -68,6 +81,7 @@ const Search = () => {
         renderItem={({ item }) => (
           <MovieCard
             item={item}
+            isSaved={savedMovieIds.has(item.id)}
             onPress={() =>
               router.push({
                 pathname: "/movie/[id]",

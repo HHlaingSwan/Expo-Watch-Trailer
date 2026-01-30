@@ -58,8 +58,8 @@ export const fetchMovieDetails = async (movieId: number, movieType: string) => {
   return data;
 };
 
-export const fetchTrendingMoviesAndTvShows = async (url: string) => {
-  const endpoint = `${TMDB_CONFIG.BASE_URL}/trending/${url}/week`;
+export const fetchPopularMovies = async (page = 1) => {
+  const endpoint = `${TMDB_CONFIG.BASE_URL}/movie/popular?language=en-US&page=${page}`;
 
   const response = await fetch(endpoint, {
     method: "GET",
@@ -67,28 +67,13 @@ export const fetchTrendingMoviesAndTvShows = async (url: string) => {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch trending movies: ${response.status}`);
+    throw new Error(`Failed to fetch popular movies: ${response.status}`);
   }
 
   const data = await response.json();
-  return data.results;
+  return { results: data.results, totalPages: data.total_pages };
 };
 
-export const fetchNowPlayingMovies = async (url: string) => {
-  const endpoint = `${TMDB_CONFIG.BASE_URL}/${url}/now_playing`;
-
-  const response = await fetch(endpoint, {
-    method: "GET",
-    headers: TMDB_CONFIG.headers,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch now playing movies: ${response.status}`);
-  }
-
-  const data = await response.json();
-  return data.results;
-};
 export const fetchSimilar = async (movieId: number, movieType: string) => {
   const endpoint = `${TMDB_CONFIG.BASE_URL}/${movieType}/${movieId}/similar`;
 
