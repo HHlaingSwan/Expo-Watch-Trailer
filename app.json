@@ -53,6 +53,13 @@
       "eas": {
         "projectId": "4f00c1db-b6e1-4a54-bf4e-57f7a3696490"
       }
+    },
+    "owner": "psychoo",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/4f00c1db-b6e1-4a54-bf4e-57f7a3696490"
     }
   }
 }

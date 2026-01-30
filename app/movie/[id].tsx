@@ -22,6 +22,7 @@ import {
   View,
 } from "react-native";
 import YoutubeIframe from "react-native-youtube-iframe";
+import { StatusBar } from 'expo-status-bar';
 
 const Details = () => {
   const { id, movieType } = useLocalSearchParams();
@@ -84,7 +85,9 @@ const Details = () => {
   );
 
   return (
-    <View className="flex-1 bg-slate-900">
+    <>
+      <StatusBar style="light" />
+      <View className="flex-1 bg-slate-900">
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         <View className="relative ">
           <Image
@@ -279,6 +282,7 @@ const Details = () => {
         </View>
       </ScrollView>
     </View>
+    </>
   );
 };
 

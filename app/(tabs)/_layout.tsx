@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { Bookmark, House, Search, User } from "lucide-react-native";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 const TabIcon = ({
   icon: Icon,
@@ -45,7 +45,7 @@ const _layout = () => {
           backgroundColor: "#0f0D23",
           borderRadius: 50,
           marginBottom: 34,
-          marginHorizontal: 18,
+          marginHorizontal: 16,
           height: 60,
           position: "absolute",
           overflow: "hidden",
@@ -101,5 +101,3 @@ const _layout = () => {
 };
 
 export default _layout;
-
-const styles = StyleSheet.create({});

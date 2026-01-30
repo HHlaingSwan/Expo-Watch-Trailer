@@ -1,50 +1,66 @@
-# Welcome to your Expo app 👋
+# MovieAppRN
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A beautiful React Native app for browsing, searching, and saving your favorite movies. Built using Expo and powered by the TMDB (The Movie Database) API, MovieAppRN is the perfect starting point for mobile movie discovery.
 
-## Get started
+## Features
 
-1. Install dependencies
+- 📖 Browse trending and popular movies
+- 🔎 Search for movies by title or keyword
+- 📝 View detailed information, ratings, genres, and release dates
+- ⭐️ Save movies to your personal favorites list
+- 🖼️ Enjoy clean UI and smooth navigation
 
-   ```bash
-   npm install
-   ```
+## Tech Stack
 
-2. Start the app
+- [Expo](https://expo.dev) & React Native
+- [TMDB API](https://www.themoviedb.org/documentation/api)
+- [React Navigation](https://reactnavigation.org/)
+- [Redux Toolkit](https://redux-toolkit.js.org/) (or Context API – adjust as needed)
 
-   ```bash
-   npx expo start
-   ```
+## Getting Started
 
-In the output, you'll find options to open the app in a
+1. **Clone the repository:**
+    ```bash
+    git clone https://github.com/yourusername/MovieAppRN.git
+    cd MovieAppRN
+    ```
+2. **Install dependencies:**
+    ```bash
+    npm install
+    ```
+3. **Obtain a TMDB API key:**
+   - Sign up at [TMDB](https://www.themoviedb.org/) and request an API key.
+   - Add your key to a `.env` file:
+     ```
+     TMDB_API_KEY=your_api_key_here
+     ```
+4. **Start the application:**
+    ```bash
+    npx expo start
+    ```
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   You can launch the app in Expo Go, Android emulator, or iOS simulator.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Project Structure
 
-## Get a fresh project
+- **app/** - All source code and screens
+- **components/** - Reusable UI components
+- **store/** - Redux state (or context)
+- **assets/** - Images and fonts
 
-When you're ready, run:
+## Contributing
 
-```bash
-npm run reset-project
-```
+Pull requests, suggestions, and issues are welcome! 
+Feel free to open an issue or PR to improve code, add features, or fix bugs.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Credits
+- [TMDB](https://www.themoviedb.org/) for movie data and imagery
+- Expo & React Native community
 
-## Learn more
+## License
 
-To learn more about developing your project with Expo, look at the following resources:
+This project is open-source and available under the MIT License.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Enjoy discovering movies with MovieAppRN!
